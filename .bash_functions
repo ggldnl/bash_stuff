@@ -210,6 +210,38 @@ function remove_files_matching_extension () {
 }
 export -f remove_files_matching_extension
 
+# [all]
+# Returns the total number of files in the current/argument folder.
+# Usage: count_files | count_files <dir>
+function count_files () {
+	if [ $# -eq 1 ]; then
+		num_files=$(ls | wc -l)
+	elif [ $# -eq 2 ]; then
+		num_files=$(ls $2 | wc -l)
+	else
+		echo "Usage: count_files | count_files <dir>"
+	fi
+	echo $num_files
+}
+export -f count_files
+
+# [all]
+# Returns the total number of files in the current/argument folder
+# matching the argument extension.
+# Usage: count_files_matching_extension <ext> | count_files_matching_extension <ext> <dir>
+function count_files_matching_extension () {
+	ext=$(get_extension $1) # c -> .c dot is included by get_extension
+	if [ $# -eq 1 ]; then
+		num_files=$(ls *$ext | wc -l)
+	elif [ $# -eq 2 ]; then
+		num_files=$(ls $2/*$ext | wc -l)
+	else
+		echo "Usage: count_files | count_files <dir>"
+	fi
+	echo $num_files
+}
+export -f count_files_matching_extension
+
 # ---------------------------------------------------------------------------- #
 
 [ "$VERBOSE_SCRIPT" = true ] && echo "All functions imported"
