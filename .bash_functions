@@ -63,9 +63,9 @@ function parse_extension () {
 	#new_ext=$(echo $1 | sed -e 's/\.//gp') # only removes the dots
 	#new_ext=$(echo $1 | sed 's/\(\.\)\1\+/\1/g') # only removes all the dots except for the first
 
-	# add a dot at the beginning 
+	# add a dot at the beginning
 	new_ext=$(echo $new_ext | sed 's/^/\./')
-	
+
 	echo $new_ext
 }
 export -f parse_extension
@@ -180,6 +180,35 @@ function remove_matching_extension_g () {
 	fi
 }
 export -f remove_matching_extension_g
+
+# [all]
+# List files in current/argument folder with particular extension
+function list_extension () {
+	ext=$(get_extension $1) # c -> .c dot is included by get_extension
+	if [ $# -eq 1 ]; then
+		res=$(ls *$ext)
+	elif [ $# -eq 2 ]; then
+		res=$(ls $2/*$ext)
+	else
+		echo "Usage: list_extension <ext> | list_extension <dir> <ext>"
+	fi
+	echo $res
+}
+export -f list_extension
+
+# [all]
+# Remove files matching the extension in the current/argument folder.
+# Usage: remove_files_matching_extension <ext> | remove_files_matching_extension <dir> <ext>
+function remove_files_matching_extension () {
+	if [ $# -eq 1 ]; then
+		rm $(list_extension $1)
+	elif [ $# -eq 2 ]; then
+		rm $(list_extension $2 $1)
+	else
+		echo "Usage: remove_files_matching_extension <ext> | remove_files_matching_extension <dir> <ext>"
+	fi
+}
+export -f remove_files_matching_extension
 
 # ---------------------------------------------------------------------------- #
 
