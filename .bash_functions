@@ -17,6 +17,10 @@ function remove_package () {
 
 # [all]
 # Returns the extension of the file passed as argument
+# Remember to use double quotes "" to pass the file if it contains spaces
+#
+# file=path/to/file with spaces.ext
+# get_extension "$file" 
 function get_extension () {
 	ext=""
 	if [ $# -eq 1 ]; then
@@ -45,6 +49,21 @@ function get_filename () {
 	echo $fname
 }
 export -f get_filename
+
+# [all]
+# Returns the name of the parent directory (no pending /)
+# Usage: get_directory <file/folder>
+function get_directory () {
+
+	if [ $# -ne 1 ]; then
+		echo "Usage: get_directory <file/folder>"
+		return
+	fi
+
+	parentdir="$(dirname "$1")"
+	echo $parentdir
+}
+export -f get_directory
 
 # [all]
 # Receives an extension as argument, returns the extension making sure that:
@@ -259,15 +278,19 @@ export -f count_files_matching_extension
 # Recursively rename the file in argument to only have lowercase letters.
 # Usage: lowercase_file <file>
 function lowercase_file () {
-
+	
 	if [ $# -ne 1 ]; then
-		echo "Usage: lowercase_file <file>"
+		echo "Usage: uppercase_file <file>"
 		return
 	fi
 
-	name="$(echo $1 | tr ' -' '_')"
-	name="$(echo $name | tr '[:upper:]' '[:lower:]')"
-	
+	filename=$(basename -- "$1")
+	filename="$(echo $filename | tr ' -' '_')"
+	filename="$(echo $filename | tr '[:upper:]' '[:lower:]')"
+
+	basename=$(get_directory "$1")
+	name=$basename/$filename
+
 	if [ "$1" != "$name" ]; then
 		mv "$1" "$name"
 	fi
@@ -284,8 +307,12 @@ function uppercase_file () {
 		return
 	fi
 
-	name="$(echo $1 | tr ' -' '_')"
-	name="$(echo $name | tr '[:lower:]' '[:upper:]')"
+	filename=$(basename -- "$1")
+	filename="$(echo $filename | tr ' -' '_')"
+	filename="$(echo $filename | tr '[:lower:]' '[:upper:]')"
+
+	basename=$(get_directory "$1")
+	name=$basename/$filename
 
 	if [ "$1" != "$name" ]; then
 		mv "$1" "$name"
