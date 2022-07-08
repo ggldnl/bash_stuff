@@ -24,6 +24,7 @@ function get_extension () {
 		ext=".${filename##*.}"
 	else
 		echo "Usage: get_extension <file>"
+		return
 	fi
 	echo $ext
 }
@@ -39,6 +40,7 @@ function get_filename () {
 		fname="${fname%.*}"
 	else
 		echo "Usage: get_filename <file>"
+		return
 	fi
 	echo $fname
 }
@@ -83,6 +85,7 @@ function extension_matching () {
 		fi
 	else
 		echo "Usage: remove_matching_extension <file> <extension_to_match>"
+		return
 	fi
 	echo $result
 }
@@ -97,6 +100,7 @@ function add_extension () {
 		mv $1 $1$ext;
 	else
 		echo "Usage: add_extension <file> <extension>"
+		return
 	fi
 }
 export -f add_extension
@@ -111,6 +115,7 @@ function add_extension_g () {
 		for f in $1/*; do add_extension $f $2; done;
 	else
 		echo "Usage: add_extension_g <extension> | add_extension_g <dir> <extension>"
+		return
 	fi
 }
 export -f add_extension_g
@@ -127,6 +132,7 @@ function remove_extension () {
 		mv $1 $basename;
 	else
 		echo "Usage: remove_extension <file>"
+		return
 	fi
 }
 export -f remove_extension
@@ -143,6 +149,7 @@ function remove_extension_g () {
 		for f in $1/*; do remove_extension $f; done;
 	else
 		echo "Usage: remove_extension_g | remove_extension_g <dir>"
+		return
 	fi
 }
 export -f remove_extension_g
@@ -161,6 +168,7 @@ function remove_matching_extension () {
 		fi
 	else
 		echo "Usage: remove_matching_extension <file> <extension_to_match>"
+		return
 	fi
 }
 export -f remove_matching_extension
@@ -177,6 +185,7 @@ function remove_matching_extension_g () {
 		for f in $1/*; do remove_matching_extension $f $2; done;
 	else
 		echo "Usage: remove_matching_extension_g <ext> | remove_matching_extension_g <dir> <ext>"
+		return
 	fi
 }
 export -f remove_matching_extension_g
@@ -191,6 +200,7 @@ function list_extension () {
 		res=$(ls $2/*$ext)
 	else
 		echo "Usage: list_extension <ext> | list_extension <dir> <ext>"
+		return
 	fi
 	echo $res
 }
@@ -206,6 +216,7 @@ function remove_files_matching_extension () {
 		rm $(list_extension $2 $1)
 	else
 		echo "Usage: remove_files_matching_extension <ext> | remove_files_matching_extension <dir> <ext>"
+		return
 	fi
 }
 export -f remove_files_matching_extension
@@ -220,6 +231,7 @@ function count_files () {
 		num_files=$(ls $2 | wc -l)
 	else
 		echo "Usage: count_files | count_files <dir>"
+		return
 	fi
 	echo $num_files
 }
@@ -236,11 +248,126 @@ function count_files_matching_extension () {
 	elif [ $# -eq 2 ]; then
 		num_files=$(ls $2/*$ext | wc -l)
 	else
-		echo "Usage: count_files | count_files <dir>"
+		echo "Usage: count_files_matching_extension <ext> | count_files_matching_extension <ext> <dir>"
+		return
 	fi
 	echo $num_files
 }
 export -f count_files_matching_extension
+
+# [all]
+# Recursively rename the file in argument to only have lowercase letters.
+# Usage: lowercase_file <file>
+function lowercase_file () {
+
+	if [ $# -ne 1 ]; then
+		echo "Usage: lowercase_file <file>"
+		return
+	fi
+
+	name="$(echo $1 | tr ' -' '_')"
+	name="$(echo $name | tr '[:upper:]' '[:lower:]')"
+	
+	if [ "$1" != "$name" ]; then
+		mv "$1" "$name"
+	fi
+}
+export -f lowercase_file
+
+# [all]
+# Recursively rename the file in argument to only have uppercase letters.
+# Usage: uppercase_file <file>
+function uppercase_file () {
+
+	if [ $# -ne 1 ]; then
+		echo "Usage: uppercase_file <file>"
+		return
+	fi
+
+	name="$(echo $1 | tr ' -' '_')"
+	name="$(echo $name | tr '[:lower:]' '[:upper:]')"
+
+	if [ "$1" != "$name" ]; then
+		mv "$1" "$name"
+	fi
+}
+export -f uppercase_file
+
+# [all]
+# Recursively rename all the files in current/argument folder
+# to only have lowercase letters.
+# Credits: https://stackoverflow.com/questions/152514/how-do-i-rename-all-folders-and-files-to-lowercase-on-linux
+# Usage: recursively_lowercase | recursively_lowercase <folder>
+function recursively_lowercase () { 
+
+	if [ $# -eq 0 ]; then
+		folder=.
+	elif [ $# -eq 1 ]; then
+		folder=$1
+	else
+		echo "Usage: recursively_lowercase | recursively_lowercase <folder>"
+		return
+	fi
+
+	if [ ! -d $folder ]; then
+		echo "Usage: recursively_lowercase | recursively_lowercase <folder>"
+		return
+	fi
+
+	for f in $folder/*; do 
+
+		name="$(echo $f | tr ' -' '_')"
+		name="$(echo $name | tr '[:upper:]' '[:lower:]')"
+		
+		if [ "$f" != "$name" ]; then
+			mv "$f" "$name"
+		fi
+
+		if [ -d $name ]; then
+			recursively_lowercase $name
+		fi
+
+	done
+}
+export -f recursively_lowercase
+
+# [all]
+# Recursively rename all the files in current/argument folder
+# to only have uppercase letters.
+# Credits: https://stackoverflow.com/questions/152514/how-do-i-rename-all-folders-and-files-to-uppercase-on-linux
+# Usage: recursively_uppercase | recursively_uppercase <folder>
+function recursively_uppercase () { 
+
+	if [ $# -eq 0 ]; then
+		folder=.
+	elif [ $# -eq 1 ]; then
+		folder=$1
+	else
+		echo "Usage: recursively_uppercase | recursively_uppercase <folder>"
+		return
+	fi
+
+	if [ ! -d $folder ]; then
+		echo "Usage: recursively_uppercase | recursively_uppercase <folder>"
+		return
+	fi
+
+	for f in $folder/*; do 
+
+		name="$(echo $f | tr ' -' '_')"
+		name="$(echo $name | tr '[:lower:]' '[:upper:]')"
+		
+		if [ "$f" != "$name" ]; then
+			mv "$f" "$name"
+		fi
+
+		if [ -d $name ]; then
+			recursively_uppercase $name
+		fi
+
+	done
+}
+export -f recursively_uppercase
 
 # ---------------------------------------------------------------------------- #
 
