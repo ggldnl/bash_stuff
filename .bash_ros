@@ -1,0 +1,27 @@
+#!/bin/bash
+
+[ "$VERBOSE_SCRIPT" = true ] && echo "Importing ROS stuff"
+
+# -------------------------- add here ROS stuff  ----------------------------- #
+
+function build_package {
+    previous_dir=$(pwd);
+    roscd $1;
+    cd ../..;
+    catkin_make -DCATKIN_WHITELIST_PACKAGES="$1";
+    cd $previous_dir;
+}
+export -f build_package
+
+# master configuration
+export CONNECTION=wlp4s0 #wlan0
+export ROS_IP=$(ifconfig "${CONNECTION}"|sed -n "s/^ *inet [^0-9.]*\([0-9.]*\) .*$/\1/p") #strip away the IP
+export ROS_MASTER_IP="${ROS_IP}"
+export ROS_MASTER_PORT=11311
+export ROS_MASTER_URI=http://"${ROS_MASTER_IP}":"${ROS_MASTER_PORT}"
+export ROS_HOSTNAME="${ROS_IP}"
+
+# ---------------------------------------------------------------------------- #
+
+[ "$VERBOSE_SCRIPT" = true ] && echo "ROS stuff mported"
+
