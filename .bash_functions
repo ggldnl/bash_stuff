@@ -20,7 +20,7 @@ function remove_package () {
 # Remember to use double quotes "" to pass the file if it contains spaces
 #
 # file=path/to/file with spaces.ext
-# get_extension "$file" 
+# get_extension "$file"
 function get_extension () {
 	ext=""
 	if [ $# -eq 1 ]; then
@@ -126,7 +126,7 @@ export -f add_extension
 
 # [all]
 # Add the extension to all the files (g stands for globally) in the current/argument folder
-# Usage: add_extension_g <extension> | add_extension_g <dir> <extension> 
+# Usage: add_extension_g <extension> | add_extension_g <dir> <extension>
 function add_extension_g () {
 	if [ $# -eq 1 ]; then # add the extension to the files in the current folder
 		for f in * ; do add_extension $f $1; done;
@@ -157,8 +157,8 @@ function remove_extension () {
 export -f remove_extension
 
 # [all]
-# Remove the extension from all the files in the current/argument folder. If the file has no 
-# extension, the mv will "silently" fail (it will fail and complain but the script will go on). 
+# Remove the extension from all the files in the current/argument folder. If the file has no
+# extension, the mv will "silently" fail (it will fail and complain but the script will go on).
 # The extension is removed whatever it is, it is not matched first
 # Usage: remove_extension_g | remove_extension_g <dir>
 function remove_extension_g () {
@@ -174,7 +174,7 @@ function remove_extension_g () {
 export -f remove_extension_g
 
 # [all]
-# Remove the extension from the input file, if matching. 
+# Remove the extension from the input file, if matching.
 # Usage: remove_matching_extension <file> <extension_to_match>
 function remove_matching_extension () {
 	if [ $# -eq 2 ]; then
@@ -193,8 +193,8 @@ function remove_matching_extension () {
 export -f remove_matching_extension
 
 # [all]
-# Remove the extension from all the files in the current/argument folder. If the file has no 
-# extension, the mv will "silently" fail (it will fail and complain but the script will go on). 
+# Remove the extension from all the files in the current/argument folder. If the file has no
+# extension, the mv will "silently" fail (it will fail and complain but the script will go on).
 # The extension is removed whatever it is, it is not matched first
 # Usage: remove_matching_extension_g <ext> | remove_matching_extension_g <dir> <ext>
 function remove_matching_extension_g () {
@@ -278,7 +278,7 @@ export -f count_files_matching_extension
 # Recursively rename the file in argument to only have lowercase letters.
 # Usage: lowercase_file <file>
 function lowercase_file () {
-	
+
 	if [ $# -ne 1 ]; then
 		echo "Usage: uppercase_file <file>"
 		return
@@ -325,7 +325,7 @@ export -f uppercase_file
 # to only have lowercase letters.
 # Credits: https://stackoverflow.com/questions/152514/how-do-i-rename-all-folders-and-files-to-lowercase-on-linux
 # Usage: recursively_lowercase | recursively_lowercase <folder>
-function recursively_lowercase () { 
+function recursively_lowercase () {
 
 	if [ $# -eq 0 ]; then
 		folder=.
@@ -341,11 +341,11 @@ function recursively_lowercase () {
 		return
 	fi
 
-	for f in $folder/*; do 
+	for f in $folder/*; do
 
 		name="$(echo $f | tr ' -' '_')"
 		name="$(echo $name | tr '[:upper:]' '[:lower:]')"
-		
+
 		if [ "$f" != "$name" ]; then
 			mv "$f" "$name"
 		fi
@@ -363,7 +363,7 @@ export -f recursively_lowercase
 # to only have uppercase letters.
 # Credits: https://stackoverflow.com/questions/152514/how-do-i-rename-all-folders-and-files-to-uppercase-on-linux
 # Usage: recursively_uppercase | recursively_uppercase <folder>
-function recursively_uppercase () { 
+function recursively_uppercase () {
 
 	if [ $# -eq 0 ]; then
 		folder=.
@@ -379,11 +379,11 @@ function recursively_uppercase () {
 		return
 	fi
 
-	for f in $folder/*; do 
+	for f in $folder/*; do
 
 		name="$(echo $f | tr ' -' '_')"
 		name="$(echo $name | tr '[:lower:]' '[:upper:]')"
-		
+
 		if [ "$f" != "$name" ]; then
 			mv "$f" "$name"
 		fi
@@ -395,6 +395,38 @@ function recursively_uppercase () {
 	done
 }
 export -f recursively_uppercase
+
+# [all]
+# Clear Git master branch history in the Git server
+# Source: https://www.systutorials.com/how-to-clear-git-history-in-local-and-remote-branches/
+# Usage: clear_git_branch <branch>
+function clear_git_branch () {
+
+	if [ $# -ne 1 ]; then
+		echo "Usage: clear_git_branch <branch>"
+		return
+	fi
+
+	tmp_branch_name="tmp-"$1
+
+	# create a temporary branch
+	git checkout --orphan $tmp_branch_name
+
+	# Add all files and commit them
+	git add -A
+
+	git commit -m 'Cleaned history'
+
+	# Deletes the old branch
+	git branch -D $1
+
+	# Rename the current branch like the old one
+	git branch -m $1
+
+	# Force push the new branch to Git server
+	git push -f origin $1
+}
+export -f clear_git_branch
 
 # ---------------------------------------------------------------------------- #
 
